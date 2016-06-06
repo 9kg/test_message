@@ -3,16 +3,147 @@
 <head>
     <meta charset="UTF-8">
     <title>test message</title>
+    <style type="text/css">
+        body{
+            font-size: 14px;
+        }
+        .add_name{
+            width: 200px;
+            height: 28px;
+            box-sizing: border-box;
+            margin-bottom: 5px;
+        }
+        .add_content{
+            height: 100px;
+            border-color: #ddd;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        .btn_add{
+            height: 30px;
+            width: 50px;
+            background-color: #32A8E0;
+            color: #fff;
+            border: none;
+            float: right;
+            margin: 0;
+        }
+        .messages{
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+        }
+        .message{
+            background-color: #fff;
+        }
+        .message>p.content{
+            margin: 0;
+            padding: 10px;
+            border:1px solid #eee;
+            border-top: none;
+            border-bottom: none;
+        }
+        .message:last-child>p.content{
+            margin: 0;
+            padding: 10px;
+            border-bottom:1px solid #eee;
+        }
+        .message .header{
+            background-color: #5CAFF9;
+            padding: 5px;
+            color: #fff;
+        }
+        .message .username{
+            margin-right: 5px;
+            font-weight: bold;
+            font-size: 16px;
+        }
+        .message .datetime{
+            color: #eee;
+            font-size: 12px;
+            float: right;
+        }
+        .message .userip{
+            font-size: 12px;
+            color: #eee;
+        }
+    </style>
 </head>
 <body>
-    <div class="content"></div>
+    <div class="add_content_ct">
+        <textarea class="add_content" placeholder="请输入您的留言~"></textarea>
+    </div>
+    <div class="add_name_ct">
+        <input type="text" class="add_name" placeholder="姓名">
+        <button type="button" class="btn_add">留言</button>
+    </div>
+    <ul class="messages">
+    </ul>
     <script src="http://apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"></script>
     <script type="text/javascript">
+        /**
+         * 将一个string 进行左右补全
+         * @param str
+         * @param pad  补全的字符
+         * @param length  补全的长度
+         * @param leftmode  是否左边补全
+         * @returns
+        */
+        function toPad(str, pad, length, leftmode){
+            var temp = '';
+            str = String(str);
+            pad = String(pad);
+            length = length - str.length;
+            while(length-- > 0){
+                temp += pad;
+            }
+            return leftmode == true ? (temp + str) : (str + temp);
+        };
+
         $(function(){
-            $.ajax({
-                url: 'http://bao.bramble.wang:3001/message/query'
-            }).done(function(data){
-                $('.content').text(JSON.stringify(data));
+            function renderMsg(){
+                $.ajax({
+                    url: 'http://bao.bramble.wang:3001/message/query'
+                }).done(function(data){
+                    var $lis = $.map(data, function(item,i){
+                        var datetime = new Date(item.datetime);
+                        datetime = datetime.getFullYear()+'-'+ toPad(datetime.getMonth(),0,2,true)+'-'+toPad(datetime.getDate(),0,2,true)+' '+toPad(datetime.getHours(),0,2,true)+':'+toPad(datetime.getMinutes(),0,2,true)+':'+toPad(datetime.getSeconds(),0,2,true);
+                        var $li = $('<li class="message" data-id="'+item.id+'">'
+                                        +'<div class="header">'
+                                            +'<span class="datetime">'+datetime+'</span>'
+                                            +'<span class="username">'+item.name+'</span>'
+                                            +'<span class="userip">[IP:'+item.ip+']</span>'
+                                        +'</div>'
+                                        +'<p class="content">'
+                                            +item.content
+                                        +'</p>'
+                                    +'</li>');
+                        return $li;
+                    });
+                    $('.messages').append($lis);
+                });
+            }
+            renderMsg();
+
+            $('body').on('click','.btn_add',function(){
+                var name = $('.add_name').val();
+                var content = $('.add_content').val();
+                if(name && content){
+                    $.ajax({
+                        url: 'http://bao.bramble.wang:3001/message/insert',
+                        type: 'POST',
+                        data: {
+                            name: name,
+                            content: content
+                        }
+                    }).done(function(data){
+                        if(data.serverStatus === 2){
+                            renderMsg();
+                        }
+                    });
+                }else{
+                    alert('姓名或内容不能为空！');
+                }
             });
         });
     </script>
