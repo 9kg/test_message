@@ -5,6 +5,16 @@
     <title>test message</title>
 </head>
 <body>
-    ceshi
+    <div class="content"></div>
+    <script src="http://apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"></script>
+    <script type="text/javascript">
+        $(function(){
+            $.ajax({
+                url: 'http://bao.bramble.wang:3001/message/query'
+            }).done(function(data){
+                $('.content').text(JSON.stringify(data));
+            });
+        });
+    </script>
 </body>
 </html>
