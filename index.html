@@ -111,13 +111,13 @@
                         var $li = $('<li class="message" data-id="'+item.id+'">'
                                         +'<div class="header">'
                                             +'<span class="datetime">'+datetime+'</span>'
-                                            +'<span class="username">'+item.name+'</span>'
+                                            +'<span class="username"></span>'
                                             +'<span class="userip">[IP:'+item.ip+']</span>'
                                         +'</div>'
-                                        +'<p class="content">'
-                                            +item.content
-                                        +'</p>'
+                                        +'<p class="content"></p>'
                                     +'</li>');
+                            $li.find('.username')text(item.name);
+                            $li.find('.content')text(item.content);
                         return $li;
                     });
                     $('.messages').html($lis);
