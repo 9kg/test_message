@@ -103,7 +103,7 @@
         $(function(){
             function renderMsg(){
                 $.ajax({
-                    url: 'http://bao.bramble.wang:3001/message/query'
+                    url: 'http://bramble.wang:3001/message/query'
                 }).done(function(data){
                     var $lis = $.map(data, function(item,i){
                         var datetime = new Date(item.datetime);
@@ -130,7 +130,7 @@
                 var content = $('.add_content').val();
                 if(name && content){
                     $.ajax({
-                        url: 'http://bao.bramble.wang:3001/message/insert',
+                        url: 'http://bramble.wang:3001/message/insert',
                         type: 'POST',
                         data: {
                             name: name,
